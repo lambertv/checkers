@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 public class CheckersView extends JPanel implements MouseListener{
     private static Board game_board = new Board();
     private static ImagePanel board_panel = new ImagePanel(game_board.get_pieces());
+    private CheckerPiece current_piece;
 
     private static void createAndShowGUI() {
 
@@ -52,11 +53,29 @@ public class CheckersView extends JPanel implements MouseListener{
             int y = (e.getY()-16)/33;
             System.out.println(x);
             System.out.println(y);
+            current_piece = game_board.get_piece(x,y);
         }
     }
 
     public void mouseReleased(MouseEvent e) {
         System.out.println("MOUSE RELEASED");
+        if (e.getX() > 16 && e.getX() < 16+33*8 &&
+            e.getY() > 16 && e.getY() < 16+33*8) {
+            int x = (e.getX()-16)/33;
+            int y = (e.getY()-16)/33;
+            System.out.println(x);
+            System.out.println(y);
+            if (current_piece != null) {
+                game_board.remove_piece(current_piece.getX(), 
+                                        current_piece.getY());
+                current_piece.moveTo(x,y);
+                game_board.add_piece(current_piece);
+                current_piece = null;
+            }
+        }
+        board_panel.update_pieces(game_board.get_pieces());
+        board_panel.repaint();
+
     }
 
     public void mouseEntered(MouseEvent e) {

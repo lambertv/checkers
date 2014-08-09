@@ -29,6 +29,10 @@ public class ImagePanel extends JPanel {
         this.pieces = pieces;
     }
 
+    public void update_pieces(LinkedList<CheckerPiece> new_pieces) {
+        this.pieces = new_pieces;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
