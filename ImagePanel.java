@@ -1,11 +1,11 @@
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.LinkedList;
-import java.util.ListIterator;
+import java.util.HashMap;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
@@ -14,9 +14,9 @@ public class ImagePanel extends JPanel {
     private BufferedImage board_image;
     private BufferedImage red_checker_image;
     private BufferedImage black_checker_image;
-    private LinkedList<CheckerPiece> pieces;
+    private HashMap<Point, CheckerPiece> pieces;
 
-    public ImagePanel(LinkedList<CheckerPiece> pieces) {
+    public ImagePanel(HashMap<Point, CheckerPiece> pieces) {
         try {
             board_image = ImageIO.read(new File("checker_board.png"));
             red_checker_image = ImageIO.read(new File("red_checker.png"));
@@ -29,7 +29,7 @@ public class ImagePanel extends JPanel {
         this.pieces = pieces;
     }
 
-    public void update_pieces(LinkedList<CheckerPiece> new_pieces) {
+    public void update_pieces(HashMap<Point, CheckerPiece> new_pieces) {
         this.pieces = new_pieces;
     }
 
@@ -38,15 +38,14 @@ public class ImagePanel extends JPanel {
         super.paintComponent(g);
         g.drawImage(board_image, 0, 0, null);
 
-        ListIterator<CheckerPiece> list_iterator = pieces.listIterator();
-        while (list_iterator.hasNext()) {
-            CheckerPiece current_piece = list_iterator.next();
-            int x = current_piece.getX();
-            int y = current_piece.getY();
-            if (current_piece.get_color() == PieceType.BLACK) {
-                g.drawImage(black_checker_image, 16+x*33, 16+y*33, null);
-            } else {
-                g.drawImage(red_checker_image, 16+x*33, 16+y*33, null);
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                Point space = new Point(x,y);
+                if (pieces.containsKey(space) && pieces.get(space).get_color() == PieceType.BLACK) {
+                    g.drawImage(black_checker_image, 16+x*33, 16+y*33, null);
+                } else if (pieces.containsKey(space) && pieces.get(space).get_color() == PieceType.RED) {
+                    g.drawImage(red_checker_image, 16+x*33, 16+y*33, null);
+                }
             }
         }
     }
