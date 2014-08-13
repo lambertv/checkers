@@ -69,12 +69,16 @@ public class CheckersView extends JPanel implements MouseListener{
             System.out.println(x);
             System.out.println(y);
             if (pressed_space.x != -1) {
-                Move move = new Move(pressed_space, new Point(x,y));
-                game_board.make_move(move);
+                Move move = game_board.find_valid_move(pressed_space, new Point(x,y));
+                if (!move.get_start_space().equals(move.get_end_space())) {
+                    game_board.make_move(move);
+                }
                 pressed_space = null;
             }
             board_panel.update_pieces(game_board.get_pieces());
             board_panel.repaint();
+            game_board.print_moves_list();
+            game_board.print_pieces_list();
         }
 
     }
