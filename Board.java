@@ -66,8 +66,21 @@ public class Board {
 
     public void make_move(Move current_move) {
         CheckerPiece piece_to_move = pieces.get(new Point(current_move.get_start_space()));
+        if (current_move.is_jump()) {
+            LinkedList<Point> jumping_spaces = current_move.get_jump_spaces();
+            ListIterator<Point> li = jumping_spaces.listIterator();
+            while (li.hasNext()) {
+                pieces.remove(li.next());
+            }
+        }
         pieces.put(current_move.get_end_space(), piece_to_move);
         pieces.remove(current_move.get_start_space());
+        board_moves = create_moves_map(pieces, turn_color);
+        if (turn_color == PieceType.BLACK) {
+            turn_color = PieceType.RED;
+        } else {
+            turn_color = PieceType.BLACK;
+        }
     }
 
     public HashMap<Point, LinkedList<Move>> get_board_moves() {
@@ -80,6 +93,7 @@ public class Board {
 
     private HashMap<Point, LinkedList<Move>> create_moves_map(HashMap<Point, CheckerPiece> all_pieces, PieceType turn) {
         HashMap<Point, LinkedList<Move>> moves_map = new HashMap<Point, LinkedList<Move>>();
+        System.out.println(moves_map.toString());
         for (Map.Entry<Point, CheckerPiece> entry : pieces.entrySet()) {
             Point space = entry.getKey();
             CheckerPiece piece = entry.getValue();
@@ -115,31 +129,36 @@ public class Board {
 
     private LinkedList<Move> create_jump_moves(Point space, LinkedList<Move> moves_list, Move current_move) {
         for (JumpMovement movement : JumpMovement.values()) {
-            if (is_valid_jump(space, movement)) {
-                Move new_current_move = current_move;
+            if (is_valid_jump(current_move, space, movement)) {
+                Move new_current_move = new Move(current_move);
                 new_current_move.add(movement);
                 moves_list.add(new_current_move);
                 Point new_space = new Point(space.x, space.y);
                 new_space.x += movement.x;
                 new_space.y += movement.y;
-                create_jump_moves(new_space, moves_list, new_current_move);
+                moves_list = create_jump_moves(new_space, moves_list, new_current_move);
             }
         }
         return moves_list;
     }
 
-    private boolean is_valid_jump(Point start_space, JumpMovement movement) {
+    private boolean is_valid_jump(Move move, Point current_space, JumpMovement movement) {
         boolean validity = true;
-        Point end_space = new Point(start_space.x, start_space.y);
+        LinkedList<Point> jumping_spaces = move.get_jump_spaces();
+        Point end_space = new Point(current_space.x, current_space.y);
         end_space.x += movement.x;
         end_space.y += movement.y;
-        Point jumping_space = start_space;
+        Point jumping_space = new Point(current_space.x, current_space.y);
         jumping_space.x += (movement.x/2);
         jumping_space.y += (movement.y/2);
-        if (pieces.containsKey(end_space)) {
+        Point start_space = move.get_start_space();
+        if ((pieces.containsKey(end_space) && !pieces.get(end_space).equals(start_space)) || 
+            end_space.x < 0 || end_space.x > 7 || end_space.y < 0 || end_space.y > 7) {
             validity = false;
         } else if ((!pieces.containsKey(jumping_space)) ||
                    (pieces.get(jumping_space).get_color() == turn_color)) {
+            validity = false;
+        } else if (jumping_spaces.contains(jumping_space)) {
             validity = false;
         }
         return validity;
@@ -187,6 +206,13 @@ public class Board {
                         System.out.println("STEP FORWARD LEFT");
                     } else {
                         System.out.println("???");
+                    }
+                } else {
+                    LinkedList<JumpMovement> movement_list = current_move.get_jump_movements();
+                    ListIterator<JumpMovement> li2 = movement_list.listIterator();
+                    while (li2.hasNext()) {
+                        JumpMovement movement = li2.next();
+                        System.out.print(movement.toString());
                     }
                 }
                 System.out.printf("END SPACE: %d, %d\n", end_space.x, end_space.y);
