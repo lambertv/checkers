@@ -10,7 +10,7 @@ import java.awt.event.MouseEvent;
 
 public class CheckersView extends JPanel implements MouseListener{
     private static Board game_board = new Board();
-    private static ImagePanel board_panel = new ImagePanel(game_board.get_pieces());
+    private static ImagePanel board_panel = new ImagePanel(game_board.get_pieces(), game_board.get_board_moves());
     private Point pressed_space = null;
 
     private static void createAndShowGUI() {
@@ -75,7 +75,7 @@ public class CheckersView extends JPanel implements MouseListener{
                 }
                 pressed_space = null;
             }
-            board_panel.update_pieces(game_board.get_pieces());
+            board_panel.update(game_board.get_pieces(), game_board.get_board_moves());
             board_panel.repaint();
             game_board.print_moves_list();
             game_board.print_pieces_list();

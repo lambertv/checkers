@@ -75,12 +75,12 @@ public class Board {
         }
         pieces.put(current_move.get_end_space(), piece_to_move);
         pieces.remove(current_move.get_start_space());
-        board_moves = create_moves_map(pieces, turn_color);
         if (turn_color == PieceType.BLACK) {
             turn_color = PieceType.RED;
         } else {
             turn_color = PieceType.BLACK;
-        }
+        } 
+        board_moves = create_moves_map(pieces, turn_color);
     }
 
     public HashMap<Point, LinkedList<Move>> get_board_moves() {
@@ -93,7 +93,6 @@ public class Board {
 
     private HashMap<Point, LinkedList<Move>> create_moves_map(HashMap<Point, CheckerPiece> all_pieces, PieceType turn) {
         HashMap<Point, LinkedList<Move>> moves_map = new HashMap<Point, LinkedList<Move>>();
-        System.out.println(moves_map.toString());
         for (Map.Entry<Point, CheckerPiece> entry : pieces.entrySet()) {
             Point space = entry.getKey();
             CheckerPiece piece = entry.getValue();
@@ -158,8 +157,11 @@ public class Board {
         } else if ((!pieces.containsKey(jumping_space)) ||
                    (pieces.get(jumping_space).get_color() == turn_color)) {
             validity = false;
-        } else if (jumping_spaces.contains(jumping_space)) {
-            validity = false;
+        } 
+        for (Point space : jumping_spaces) {
+            if (jumping_space.equals(space)) {
+                validity = false;
+            }
         }
         return validity;
     }

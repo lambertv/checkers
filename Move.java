@@ -1,5 +1,6 @@
 import java.awt.Point;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 public class Move {
     private Point start_space;
@@ -10,10 +11,17 @@ public class Move {
     private LinkedList<Point> jumping_spaces;
 
     public Move(Move move_copy) {
-        start_space = move_copy.get_start_space();
-        end_space = move_copy.get_end_space();
-        jumping_spaces = move_copy.get_jump_spaces();
-        jump_movements = move_copy.get_jump_movements();
+        start_space = new Point(move_copy.get_start_space().x,
+                                move_copy.get_start_space().y);
+        end_space = new Point(move_copy.get_end_space().x,
+                              move_copy.get_end_space().y);
+        jumping_spaces = new LinkedList<Point>();
+        ListIterator<Point> li = move_copy.get_jump_spaces().listIterator();
+        while (li.hasNext()) {
+            jumping_spaces.add(li.next());
+        }
+        jump_movements = new LinkedList<JumpMovement>();
+        jump_movements = (LinkedList<JumpMovement>) move_copy.get_jump_movements().clone();
         step_movement = move_copy.get_step_movement();
         is_jump = move_copy.is_jump();
     }
@@ -40,12 +48,16 @@ public class Move {
 
     public void add(JumpMovement movement) {
         jump_movements.add(movement);
+        System.out.println("previous spaces: " + jumping_spaces.toString());
         end_space.x += movement.x;
         end_space.y += movement.y;
         Point jumping_space = new Point(end_space.x, end_space.y);
+        System.out.println("space landing on: " + end_space.toString());
         jumping_space.x -= movement.x/2;
         jumping_space.y -= movement.y/2;
+        System.out.println("space jumped over: " + jumping_space.toString());
         jumping_spaces.add(jumping_space);
+        System.out.println("new space list: " + jumping_spaces.toString());
         is_jump = true;
     }
 
